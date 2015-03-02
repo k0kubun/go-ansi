@@ -14,6 +14,14 @@ func CursorForward(n int) {
 	cursorMove(n, 0)
 }
 
+func CursorUp(n int) {
+	cursorMove(n, 0)
+}
+
+func CursorDown(n int) {
+	cursorMove(n, 0)
+}
+
 func cursorMove(x int, y int) {
 	handle := syscall.Handle(os.Stdout.Fd())
 
