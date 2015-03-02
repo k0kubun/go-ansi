@@ -123,6 +123,10 @@ func (w *Writer) applyEscapeCode(buf []byte, arg string, code rune) {
 		if n, err := strconv.Atoi(arg); err == nil {
 			CursorHorizontalAbsolute(n)
 		}
+	case 'K':
+		if n, err := strconv.Atoi(arg); err == nil {
+			EraseInLine(n)
+		}
 	default:
 		buf = append(buf, string(code)...)
 		fmt.Fprint(w.out, string(buf))

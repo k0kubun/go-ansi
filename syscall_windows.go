@@ -9,6 +9,7 @@ var (
 	procGetConsoleScreenBufferInfo = kernel32.NewProc("GetConsoleScreenBufferInfo")
 	procSetConsoleTextAttribute    = kernel32.NewProc("SetConsoleTextAttribute")
 	procSetConsoleCursorPosition   = kernel32.NewProc("SetConsoleCursorPosition")
+	procFillConsoleOutputCharacter = kernel32.NewProc("FillConsoleOutputCharacterW")
 )
 
 type wchar uint16
