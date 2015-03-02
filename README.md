@@ -29,12 +29,26 @@ colorstring.Fprintln(ansi.NewAnsiStdout(), "[green]mitchellh/colorstring")
 
 ### Cursor
 
-You can control cursor in your terminal.
+You can control cursor in your terminal. Of course it works on cmd.exe.
+In a following table, "Shell" shows a unix-like shortcut for the action.
+(It is not provided by this library and just for the explanation.)
+
+| API | Escape Code | Shell | Description |
+|:----|:----------------|:--|:------------|
+| ansi.CursorUp(n) | CSI `n` A | C-p | Move the cursor n cells to up |
+| ansi.CursorDown(n) | CSI `n` B | C-n | Move the cursor n cells to down |
+| ansi.CursorForward(n) | CSI `n` C | C-f | Move the cursor n cells to right |
+| ansi.CursorBack(n) | CSI `n` D | C-b | Move the cursor n cells to left |
+| ansi.CursorHorizontalAbsolute(x) | CSI `n` G | C-a,<br>C-e | Moves the cursor to column n. |
 
 ### Display
 
 You can easily control your terminal display. You can easily provide unix-like
 shell functionarities for display, such as C-k or C-l.
+
+| API | Escape Code | Shell | Description |
+|:----|:----------------|:--|:------------|
+| ansi.EraseInLine(n) | CSI `n` K | C-k, C-u | 0: clear to the end of the line. <br> 1: clear to the beginning of the line. <br> 2: clear entire line. |
 
 ## Notes
 
