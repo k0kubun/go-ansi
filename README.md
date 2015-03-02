@@ -4,33 +4,27 @@ Windows-portable ANSI escape sequence utility for Go language
 
 ## What's this?
 
-This library converts ANSI escape sequences to Windows API calls on Windows environment.
+This library converts ANSI escape sequences to Windows API calls on Windows environment.  
+You can easily use this feature by replacing `fmt` with `ansi`.
 
 ![](http://i.gyazo.com/12ecc4e1b4387f5c56d3e6ae319ab6c4.png)
 ![](http://i.gyazo.com/c41072712ee05e28565ca92b416675e2.png)
 
-### Coloring
+### Output redirection
 
 Many coloring libraries for Go just use ANSI escape sequences, which don't work on Windows.
-If you use go-ansi, you can use these libraries' nice APIs for Windows too.
 
 - [fatih/color](https://github.com/fatih/color)
 - [mitchellh/colorstring](https://github.com/mitchellh/colorstring)
 
+If you use go-ansi, you can use these libraries' nice APIs for Windows too.
+Not only coloring, many ANSI escape sequences are available.
+
 ```go
-import (
-  "github.com/fatih/color"
-  "github.com/k0kubun/go-ansi"
-  "github.com/mitchellh/colorstring"
-)
+color.Output = ansi.NewAnsiStdout()
+color.Cyan("fatih/color")
 
-func main() {
-  color.Output = ansi.NewAnsiStdout()
-  c := color.New(color.FgCyan, color.Bold)
-  c.Println("fatih/color")
-
-  colorstring.Fprintln(ansi.NewAnsiStdout(), "[red]mitchellh/colorstring")
-}
+colorstring.Fprintln(ansi.NewAnsiStdout(), "[green]mitchellh/colorstring")
 ```
 
 ### Cursor
