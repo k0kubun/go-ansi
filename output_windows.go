@@ -13,12 +13,6 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
-var (
-	kernel32                       = syscall.NewLazyDLL("kernel32.dll")
-	procGetConsoleScreenBufferInfo = kernel32.NewProc("GetConsoleScreenBufferInfo")
-	procSetConsoleTextAttribute    = kernel32.NewProc("SetConsoleTextAttribute")
-)
-
 const (
 	foregroundBlue      = 0x1
 	foregroundGreen     = 0x2
@@ -31,31 +25,6 @@ const (
 	backgroundIntensity = 0x80
 	backgroundMask      = (backgroundRed | backgroundBlue | backgroundGreen | backgroundIntensity)
 )
-
-type wchar uint16
-type short int16
-type dword uint32
-type word uint16
-
-type coord struct {
-	x short
-	y short
-}
-
-type smallRect struct {
-	left   short
-	top    short
-	right  short
-	bottom short
-}
-
-type consoleScreenBufferInfo struct {
-	size              coord
-	cursorPosition    coord
-	attributes        word
-	window            smallRect
-	maximumWindowSize coord
-}
 
 type Writer struct {
 	out     io.Writer
@@ -149,17 +118,20 @@ func (w *Writer) handleEscape(r *bytes.Reader) (n int, err error) {
 func (w *Writer) applyEscapeCode(buf []byte, arg string, code rune) {
 	switch code {
 	case 'm':
-		w.applySgr(arg)
+		w.applySelectGraphicRendition(arg)
+	case 'G':
+		if n, err := strconv.Atoi(arg); err == nil {
+			CursorHorizontalAbsolute(n)
+		}
 	default:
 		buf = append(buf, string(code)...)
 		fmt.Fprint(w.out, string(buf))
 	}
 }
 
-// Apply SGR (Select Graphic Rendition)
 // Original implementation: https://github.com/mattn/go-colorable
-// FIXME: Import go-colorable to avoid duplicate implementation
-func (w *Writer) applySgr(arg string) {
+// FIXME: Fallback to original go-colorable to avoid duplicate implementation
+func (w *Writer) applySelectGraphicRendition(arg string) {
 	if arg == "" {
 		procSetConsoleTextAttribute.Call(uintptr(w.handle), uintptr(w.orgAttr))
 		return
