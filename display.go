@@ -7,5 +7,5 @@ import (
 )
 
 func EraseInLine(mode int) {
-	fmt.Print("\x1b[%dK", mode)
+	fmt.Printf("\x1b[%dK", mode)
 }
