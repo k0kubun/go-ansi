@@ -39,6 +39,8 @@ In a following table, "Shell" shows a unix-like shortcut for the action.
 | ansi.CursorDown(n) | CSI `n` B | C-n | Move the cursor n cells to down |
 | ansi.CursorForward(n) | CSI `n` C | C-f | Move the cursor n cells to right |
 | ansi.CursorBack(n) | CSI `n` D | C-b | Move the cursor n cells to left |
+| ansi.CursorNextLine(n) | CSI `n` E | C-n C-a | Move cursor to beginning of the line n lines down. |
+| ansi.CursorPreviousLine(n) | CSI `n` F | C-p C-a | Move cursor to beginning of the line n lines up. |
 | ansi.CursorHorizontalAbsolute(x) | CSI `n` G | C-a,<br>C-e | Moves the cursor to column n. |
 
 ### Display
@@ -48,7 +50,11 @@ shell functionarities for display, such as C-k or C-l.
 
 | API | Escape Code | Shell | Description |
 |:----|:----------------|:--|:------------|
-| ansi.EraseInLine(n) | CSI `n` K | C-k, C-u | 0: clear to the end of the line. <br> 1: clear to the beginning of the line. <br> 2: clear entire line. |
+| ansi.EraseInLine(n) | CSI `n` K | C-k, C-u,<br>C-a C-k | 0: clear to the end of the line. <br> 1: clear to the beginning of the line. <br> 2: clear entire line. |
+
+## API document
+
+https://godoc.org/github.com/k0kubun/go-ansi
 
 ## Notes
 

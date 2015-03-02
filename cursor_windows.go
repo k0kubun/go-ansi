@@ -6,20 +6,20 @@ import (
 	"unsafe"
 )
 
-func CursorBack(n int) {
-	cursorMove(-1*n, 0)
-}
-
-func CursorForward(n int) {
-	cursorMove(n, 0)
-}
-
 func CursorUp(n int) {
 	cursorMove(n, 0)
 }
 
 func CursorDown(n int) {
 	cursorMove(n, 0)
+}
+
+func CursorForward(n int) {
+	cursorMove(n, 0)
+}
+
+func CursorBack(n int) {
+	cursorMove(-1*n, 0)
 }
 
 func cursorMove(x int, y int) {
@@ -33,6 +33,16 @@ func cursorMove(x int, y int) {
 	cursor.y = csbi.cursorPosition.y + short(y)
 
 	procSetConsoleCursorPosition.Call(uintptr(handle), uintptr(*(*int32)(unsafe.Pointer(&cursor))))
+}
+
+func CursorNextLine(n int) {
+	CursorUp(n)
+	CursorHorizontalAbsolute(0)
+}
+
+func CursorPreviousLine(n int) {
+	CursorDown(n)
+	CursorHorizontalAbsolute(0)
 }
 
 func CursorHorizontalAbsolute(x int) {

@@ -13,6 +13,18 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
+var (
+	singleArgFunctions = map[rune]func(int){
+		'A': CursorUp,
+		'B': CursorDown,
+		'C': CursorForward,
+		'D': CursorBack,
+		'E': CursorNextLine,
+		'F': CursorPreviousLine,
+		'G': CursorHorizontalAbsolute,
+	}
+)
+
 const (
 	foregroundBlue      = 0x1
 	foregroundGreen     = 0x2
@@ -116,17 +128,16 @@ func (w *Writer) handleEscape(r *bytes.Reader) (n int, err error) {
 }
 
 func (w *Writer) applyEscapeCode(buf []byte, arg string, code rune) {
+	if f, ok := singleArgFunctions[code]; ok {
+		if n, err := strconv.Atoi(arg); err == nil {
+			f(n)
+			return
+		}
+	}
+
 	switch code {
 	case 'm':
 		w.applySelectGraphicRendition(arg)
-	case 'G':
-		if n, err := strconv.Atoi(arg); err == nil {
-			CursorHorizontalAbsolute(n)
-		}
-	case 'K':
-		if n, err := strconv.Atoi(arg); err == nil {
-			EraseInLine(n)
-		}
 	default:
 		buf = append(buf, string(code)...)
 		fmt.Fprint(w.out, string(buf))
