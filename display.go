@@ -2,6 +2,10 @@
 
 package ansi
 
+import (
+	"fmt"
+)
+
 func EraseInLine(mode int) {
-	fmt.Fprint("\x1b[%dK", x)
+	fmt.Print("\x1b[%dK", mode)
 }
