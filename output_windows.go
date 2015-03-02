@@ -157,6 +157,7 @@ func (w *Writer) applyEscapeCode(buf []byte, arg string, code rune) {
 }
 
 // Apply SGR (Select Graphic Rendition)
+// Original implementation: https://github.com/mattn/go-colorable
 func (w *Writer) applySgr(arg string) {
 	if arg == "" {
 		procSetConsoleTextAttribute.Call(uintptr(w.handle), uintptr(w.orgAttr))
@@ -186,6 +187,17 @@ func (w *Writer) applySgr(arg string) {
 			}
 			if (n-30)&4 != 0 {
 				attr |= foregroundBlue
+			}
+		case 40 <= n && n <= 47:
+			attr = (attr & foregroundMask)
+			if (n-40)&1 != 0 {
+				attr |= backgroundRed
+			}
+			if (n-40)&2 != 0 {
+				attr |= backgroundGreen
+			}
+			if (n-40)&4 != 0 {
+				attr |= backgroundBlue
 			}
 		}
 	}
