@@ -5,22 +5,69 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"syscall"
+	"unsafe"
+
+	"github.com/mattn/go-isatty"
 )
 
+var (
+	kernel32                       = syscall.NewLazyDLL("kernel32.dll")
+	procGetConsoleScreenBufferInfo = kernel32.NewProc("GetConsoleScreenBufferInfo")
+	procSetConsoleTextAttribute    = kernel32.NewProc("SetConsoleTextAttribute")
+)
+
+type wchar uint16
+type short int16
+type dword uint32
+type word uint16
+
+type coord struct {
+	x short
+	y short
+}
+
+type smallRect struct {
+	left   short
+	top    short
+	right  short
+	bottom short
+}
+
+type consoleScreenBufferInfo struct {
+	size              coord
+	cursorPosition    coord
+	attributes        word
+	window            smallRect
+	maximumWindowSize coord
+}
+
 type Writer struct {
-	out io.Writer
+	out     io.Writer
+	handle  uintptr
+	orgAttr uintptr
 }
 
 func NewAnsiStdout() io.Writer {
-	return &Writer{
-		out: os.Stdout,
+	var csbi consoleScreenBufferInfo
+	out := os.Stdout
+	if !isatty.IsTerminal(out.Fd()) {
+		return out
 	}
+	handle := syscall.Handle(out.Fd())
+	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
+	return &Writer{out: out, handle: uintptr(handle), orgAttr: uintptr(csbi.attributes)}
 }
 
 func NewAnsiStderr() io.Writer {
-	return &Writer{
-		out: os.Stderr,
+	var csbi consoleScreenBufferInfo
+	out := os.Stderr
+	if !isatty.IsTerminal(out.Fd()) {
+		return out
 	}
+	handle := syscall.Handle(out.Fd())
+	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
+	return &Writer{out: out, handle: uintptr(handle), orgAttr: uintptr(csbi.attributes)}
 }
 
 func (w *Writer) Write(data []byte) (n int, err error) {
@@ -85,4 +132,19 @@ func (w *Writer) handleEscape(r *bytes.Reader) (n int, err error) {
 }
 
 func (w *Writer) applyEscapeCode(buf []byte, arg string, code rune) {
+	switch code {
+	case 'm':
+		w.applySgr(arg)
+	default:
+		buf = append(buf, string(code)...)
+		fmt.Fprint(w.out, string(buf))
+	}
+}
+
+// Apply SGR (Select Graphic Rendition)
+func (w *Writer) applySgr(arg string) {
+	if arg == "" {
+		procSetConsoleTextAttribute.Call(w.handle, w.orgAttr)
+		return
+	}
 }
