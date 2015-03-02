@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
+	"strings"
 	"syscall"
 	"unsafe"
 
@@ -15,6 +17,19 @@ var (
 	kernel32                       = syscall.NewLazyDLL("kernel32.dll")
 	procGetConsoleScreenBufferInfo = kernel32.NewProc("GetConsoleScreenBufferInfo")
 	procSetConsoleTextAttribute    = kernel32.NewProc("SetConsoleTextAttribute")
+)
+
+const (
+	foregroundBlue      = 0x1
+	foregroundGreen     = 0x2
+	foregroundRed       = 0x4
+	foregroundIntensity = 0x8
+	foregroundMask      = (foregroundRed | foregroundBlue | foregroundGreen | foregroundIntensity)
+	backgroundBlue      = 0x10
+	backgroundGreen     = 0x20
+	backgroundRed       = 0x40
+	backgroundIntensity = 0x80
+	backgroundMask      = (backgroundRed | backgroundBlue | backgroundGreen | backgroundIntensity)
 )
 
 type wchar uint16
@@ -44,8 +59,8 @@ type consoleScreenBufferInfo struct {
 
 type Writer struct {
 	out     io.Writer
-	handle  uintptr
-	orgAttr uintptr
+	handle  syscall.Handle
+	orgAttr word
 }
 
 func NewAnsiStdout() io.Writer {
@@ -56,7 +71,7 @@ func NewAnsiStdout() io.Writer {
 	}
 	handle := syscall.Handle(out.Fd())
 	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
-	return &Writer{out: out, handle: uintptr(handle), orgAttr: uintptr(csbi.attributes)}
+	return &Writer{out: out, handle: handle, orgAttr: csbi.attributes}
 }
 
 func NewAnsiStderr() io.Writer {
@@ -67,7 +82,7 @@ func NewAnsiStderr() io.Writer {
 	}
 	handle := syscall.Handle(out.Fd())
 	procGetConsoleScreenBufferInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&csbi)))
-	return &Writer{out: out, handle: uintptr(handle), orgAttr: uintptr(csbi.attributes)}
+	return &Writer{out: out, handle: handle, orgAttr: csbi.attributes}
 }
 
 func (w *Writer) Write(data []byte) (n int, err error) {
@@ -144,7 +159,36 @@ func (w *Writer) applyEscapeCode(buf []byte, arg string, code rune) {
 // Apply SGR (Select Graphic Rendition)
 func (w *Writer) applySgr(arg string) {
 	if arg == "" {
-		procSetConsoleTextAttribute.Call(w.handle, w.orgAttr)
+		procSetConsoleTextAttribute.Call(uintptr(w.handle), uintptr(w.orgAttr))
 		return
 	}
+
+	var csbi consoleScreenBufferInfo
+	procGetConsoleScreenBufferInfo.Call(uintptr(w.handle), uintptr(unsafe.Pointer(&csbi)))
+	attr := csbi.attributes
+
+	for _, param := range strings.Split(arg, ";") {
+		n, err := strconv.Atoi(param)
+		if err != nil {
+			continue
+		}
+
+		switch {
+		case n == 0:
+			attr = w.orgAttr
+		case 30 <= n && n <= 37:
+			attr = (attr & backgroundMask)
+			if (n-30)&1 != 0 {
+				attr |= foregroundRed
+			}
+			if (n-30)&2 != 0 {
+				attr |= foregroundGreen
+			}
+			if (n-30)&4 != 0 {
+				attr |= foregroundBlue
+			}
+		}
+	}
+
+	procSetConsoleTextAttribute.Call(uintptr(w.handle), uintptr(attr))
 }

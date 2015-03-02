@@ -46,6 +46,11 @@ You can control cursor in your terminal.
 You can easily control your terminal display. You can easily provide unix-like
 shell functionarities for display, such as C-k or C-l.
 
+## Notes
+
+This is just a cursor and display supported version of [mattn/go-colorable](https://github.com/mattn/go-colorable).
+I used almost the same implementation as it for coloring. Many thanks for [@mattn](https://github.com/mattn).
+
 ## License
 
 MIT License
