@@ -6,12 +6,8 @@ Windows-portable ANSI escape sequence utility for Go language
 
 This library converts ANSI escape sequences to Windows API calls on Windows environment.
 
-```go
-gore> fmt.Println("\x1b[31mRED\x1b[0m")
-\x1b[31mRED\x1b[0m
-gore> ansi.Println("\x1b[31mRED\x1b[0m")
-RED
-```
+![](http://i.gyazo.com/12ecc4e1b4387f5c56d3e6ae319ab6c4.png)
+![](http://i.gyazo.com/c41072712ee05e28565ca92b416675e2.png)
 
 ### Coloring
 
