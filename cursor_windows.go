@@ -61,3 +61,23 @@ func CursorHorizontalAbsolute(x int) {
 
 	procSetConsoleCursorPosition.Call(uintptr(handle), uintptr(*(*int32)(unsafe.Pointer(&cursor))))
 }
+
+func CursorShow() {
+	handle := syscall.Handle(os.Stdout.Fd())
+
+	var cci consoleCursorInfo
+	procGetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&cci)))
+	cci.visible = 1
+
+	procSetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&cci)))
+}
+
+func CursorHide() {
+	handle := syscall.Handle(os.Stdout.Fd())
+
+	var cci consoleCursorInfo
+	procGetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&cci)))
+	cci.visible = 0
+
+	procSetConsoleCursorInfo.Call(uintptr(handle), uintptr(unsafe.Pointer(&cci)))
+}

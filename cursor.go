@@ -40,3 +40,13 @@ func CursorPreviousLine(n int) {
 func CursorHorizontalAbsolute(x int) {
 	fmt.Printf("\x1b[%dG", x)
 }
+
+// Show the cursor.
+func CursorShow() {
+	fmt.Printf("\x1b[?25h", x)
+}
+
+// Hide the cursor.
+func CursorHide() {
+	fmt.Printf("\x1b[?25l", x)
+}
