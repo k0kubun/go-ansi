@@ -43,10 +43,10 @@ func CursorHorizontalAbsolute(x int) {
 
 // Show the cursor.
 func CursorShow() {
-	fmt.Printf("\x1b[?25h", x)
+	fmt.Print("\x1b[?25h")
 }
 
 // Hide the cursor.
 func CursorHide() {
-	fmt.Printf("\x1b[?25l", x)
+	fmt.Print("\x1b[?25l")
 }
