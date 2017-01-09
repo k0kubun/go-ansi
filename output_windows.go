@@ -128,6 +128,15 @@ func (w *Writer) handleEscape(r *bytes.Reader) (n int, err error) {
 }
 
 func (w *Writer) applyEscapeCode(buf []byte, arg string, code rune) {
+	switch arg + string(code) {
+	case "?25h":
+		CursorShow()
+		return
+	case "?25l":
+		CursorHide()
+		return
+	}
+
 	if f, ok := singleArgFunctions[code]; ok {
 		if n, err := strconv.Atoi(arg); err == nil {
 			f(n)

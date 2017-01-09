@@ -10,6 +10,8 @@ var (
 	procSetConsoleTextAttribute    = kernel32.NewProc("SetConsoleTextAttribute")
 	procSetConsoleCursorPosition   = kernel32.NewProc("SetConsoleCursorPosition")
 	procFillConsoleOutputCharacter = kernel32.NewProc("FillConsoleOutputCharacterW")
+	procGetConsoleCursorInfo       = kernel32.NewProc("GetConsoleCursorInfo")
+	procSetConsoleCursorInfo       = kernel32.NewProc("SetConsoleCursorInfo")
 )
 
 type wchar uint16
@@ -35,4 +37,9 @@ type consoleScreenBufferInfo struct {
 	attributes        word
 	window            smallRect
 	maximumWindowSize coord
+}
+
+type consoleCursorInfo struct {
+	size    dword
+	visible int32
 }
