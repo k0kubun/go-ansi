@@ -7,11 +7,11 @@ import (
 )
 
 func CursorUp(n int) {
-	cursorMove(n, 0)
+	cursorMove(0, -n)
 }
 
 func CursorDown(n int) {
-	cursorMove(n, 0)
+	cursorMove(0, n)
 }
 
 func CursorForward(n int) {
@@ -19,7 +19,7 @@ func CursorForward(n int) {
 }
 
 func CursorBack(n int) {
-	cursorMove(-1*n, 0)
+	cursorMove(-n, 0)
 }
 
 func cursorMove(x int, y int) {
